@@ -43,6 +43,21 @@ console.log(e)
 res.status(400).json(e)
     }
 })
+
+app.put('/todos/:id', async (req, res) => {
+    try{
+        console.log('PUT /todos/:id')
+        const todo = await Todo.findById(req.params.id)
+       todo.completed = !todo.completed
+      await todo.save()
+      
+        console.log(todo)
+        res.json(todo)
+    }catch(e){
+        console.log(e)
+        res.json(e)
+    }
+})
 app.listen(port, () => {
     console.log('Listening on port: ' + port)
 connectionDb()

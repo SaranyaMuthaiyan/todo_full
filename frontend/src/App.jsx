@@ -1,4 +1,4 @@
- import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
 
 
@@ -8,16 +8,16 @@ function App() {
   const [todos, setTodos] = useState([])
   const inputRef = useRef()
 
-  async function getData() {
-      try {
-        const response = await fetch(BASE_URL +'/todos')
-        const data = await response.json()
-        console.log(data) 
-        setTodos(data)
-      } catch (e) {
-        console.log(e)
-      }
+async function getData() {
+    try {
+      const response = await fetch(BASE_URL + '/todos')
+      const data = await response.json()
+      console.log(data)
+      setTodos(data)
+    } catch (e) {
+      console.log(e)
     }
+  }
   useEffect(() => {
     getData()
 
@@ -25,12 +25,12 @@ function App() {
 
   console.log('todos: ', todos)
 
-  async function handleSubmit(e) {
+async function handleSubmit(e) {
     e.preventDefault()
     const todo = {
       text: inputRef.current.value
     }
-    
+
     const response = await fetch(BASE_URL + '/todos', {
       method: 'POST',
       body: JSON.stringify(todo),
@@ -45,17 +45,31 @@ function App() {
 
     setTodos([...todos, newTodo])
 
+    inputRef.current.value = ''
+
   }
 
- async function handleDelete(id){
-// console.log(id)
-   await fetch(`${BASE_URL}/todos/${id}`,{    //fetch(BASE_URL + '/todos/' + id)
-  method: 'DELETE'
-})
-getData()
+ async function handleDelete(id) {
+    // console.log(id)
+    await fetch(`${BASE_URL}/todos/${id}`, {    //fetch(BASE_URL + '/todos/' + id)
+      method: 'DELETE'
+    })
+    getData()
   }
+
+
+async function handleComplete(id){
+  // console.log(id)
+const response = await fetch(`${BASE_URL}/todos/${id}`, {    //fetch(BASE_URL + '/todos/' + id)
+      method: 'PUT'
+    })
+    getData()
+    // const data = await response.json(0)
+    // console.log(data)
+    // console.log('updating')
+}
  
-  return (
+return (
     <>
       <h1>Todos</h1>
       <form onSubmit={handleSubmit}>
@@ -63,12 +77,17 @@ getData()
         <button>Submit</button>
       </form>
       <ul>
-        {todos.map((todo) => 
+        {todos.map((todo) =>
           <li key={todo._id}>
-            <input type="checkbox" />
+            <input 
+            type="checkbox" 
+            checked={todo.completed}
+            onChange = {() => handleComplete(todo._id)}   //console.log('testing')}
+            
+          />
             {todo.text}
             <button onClick={() => handleDelete(todo._id)}>X</button>
-            </li>
+          </li>
         )}
       </ul>
     </>
