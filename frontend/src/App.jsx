@@ -1,16 +1,16 @@
  import { useEffect, useRef, useState } from 'react'
 import './App.css'
 
+
+const BASE_URL = 'http://localhost:8080'
 function App() {
 
   const [todos, setTodos] = useState([])
   const inputRef = useRef()
 
-  useEffect(() => {
-
-    async function getData() {
+  async function getData() {
       try {
-        const response = await fetch('http://localhost:8080/todos')
+        const response = await fetch(BASE_URL +'/todos')
         const data = await response.json()
         console.log(data) 
         setTodos(data)
@@ -18,7 +18,7 @@ function App() {
         console.log(e)
       }
     }
-
+  useEffect(() => {
     getData()
 
   }, [])
@@ -31,7 +31,7 @@ function App() {
       text: inputRef.current.value
     }
     
-    const response = await fetch('http://localhost:8080/todos', {
+    const response = await fetch(BASE_URL + '/todos', {
       method: 'POST',
       body: JSON.stringify(todo),
       headers: {
@@ -46,6 +46,14 @@ function App() {
     setTodos([...todos, newTodo])
 
   }
+
+ async function handleDelete(id){
+// console.log(id)
+   await fetch(`${BASE_URL}/todos/${id}`,{    //fetch(BASE_URL + '/todos/' + id)
+  method: 'DELETE'
+})
+getData()
+  }
  
   return (
     <>
@@ -56,7 +64,11 @@ function App() {
       </form>
       <ul>
         {todos.map((todo) => 
-          <li key={todo._id}>{todo.text}</li>
+          <li key={todo._id}>
+            <input type="checkbox" />
+            {todo.text}
+            <button onClick={() => handleDelete(todo._id)}>X</button>
+            </li>
         )}
       </ul>
     </>
